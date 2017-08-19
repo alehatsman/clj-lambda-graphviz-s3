@@ -9,4 +9,7 @@
                  [byte-streams "0.2.3"]
                  [environ "1.1.0"]
                  [com.taoensso/timbre "4.10.0"]
-                 [clojure-future-spec "1.9.0-alpha17"]])
+                 [clojure-future-spec "1.9.0-alpha17"]]
+  :resource-paths ["resources"]
+  :profiles {:uberjar {:aot :all}}
+  :uberjar-name "clj-lambda-graphviz-s3.zip")

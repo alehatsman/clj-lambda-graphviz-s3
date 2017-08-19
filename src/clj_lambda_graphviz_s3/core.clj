@@ -5,7 +5,9 @@
             [taoensso.timbre :as log]
             [environ.core :as environ]
             [clj-lambda-graphviz-s3.http-utils :as http-utils]
-            [clj-lambda-graphviz-s3.spec :as spec]))
+            [clj-lambda-graphviz-s3.spec :as spec]
+            [clj-lambda-graphviz-s3.graphviz :as graphviz]
+            ))
 
 (defn get-env-vars []
   ;{:open-weather-api-key (environ/env :open-weather-api-key)})
@@ -23,7 +25,8 @@
         env-vars (get-env-vars)]
     (log/info "body" body ", env-vars" env-vars)
     (with-open [w (io/writer out)]
-      (json/generate-stream (lambda-handler body) w)
+      (graphviz/generate-stream (:options body) (:source body) out)
+      ;(json/generate-stream (lambda-handler body) w)
       (log/info "lambda-function - finish"))))
 
 (def-lambda-fn clj-lambda-graphviz.WebHook
