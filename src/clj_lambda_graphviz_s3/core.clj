@@ -7,16 +7,23 @@
             [clj-lambda-graphviz-s3.http-utils :as http-utils]
             [clj-lambda-graphviz-s3.spec :as spec]
             [clj-lambda-graphviz-s3.graphviz :as graphviz]
-            ))
+            [clj-lambda-graphviz-s3.s3 :as s3]))
 
 (defn get-env-vars []
-  ;{:open-weather-api-key (environ/env :open-weather-api-key)})
-  {})
+  {:aws-access-key-id (environ/env :aws-access-key-id)
+   :aws-secret-access-key (environ/env :aws-secret-access-key)})
 
 (defn lambda-handler [body]
   (if-not (spec/valid-body? body)
     {:error (spec/explain body)}
-    {:result :ok}))
+    (do 
+      (let [file (graphviz/generate (:options body) (:source body))]
+        (try 
+          (s3/put-file file (:bucket body))
+          {:result :ok}
+          (catch Exception e
+            {:error e}
+            ))))))
 
 (defn lambda-function
   [in out context]
@@ -25,8 +32,7 @@
         env-vars (get-env-vars)]
     (log/info "body" body ", env-vars" env-vars)
     (with-open [w (io/writer out)]
-      (graphviz/generate-stream (:options body) (:source body) out)
-      ;(json/generate-stream (lambda-handler body) w)
+      (json/generate-stream (lambda-handler body) w)
       (log/info "lambda-function - finish"))))
 
 (def-lambda-fn clj-lambda-graphviz.WebHook
