@@ -26,10 +26,6 @@ $ make dot_static
 $ scp ec2-user@<place-your-number>.eu-central-1.compute.amazonaws.com:/home/ec2-user/graphviz/graphviz-2.40.1/cmd/dot/dot_static ./
 ```
 
-## Usage
-
-FIXME
-
 ## License
 
 Copyright © 2017 FIXME

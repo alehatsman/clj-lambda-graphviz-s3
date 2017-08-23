@@ -9,28 +9,21 @@
             [clj-lambda-graphviz-s3.graphviz :as graphviz]
             [clj-lambda-graphviz-s3.s3 :as s3]))
 
-(defn get-env-vars []
-  {:aws-access-key-id (environ/env :aws-access-key-id)
-   :aws-secret-access-key (environ/env :aws-secret-access-key)})
-
 (defn lambda-handler [body]
   (if-not (spec/valid-body? body)
     {:error (spec/explain body)}
-    (do 
+    (try
       (let [file (graphviz/generate (:options body) (:source body))]
-        (try 
-          (s3/put-file file (:bucket body))
-          {:result :ok}
-          (catch Exception e
-            {:error e}
-            ))))))
+        (s3/put-file file (:bucket body))
+        {:result :ok})
+      (catch Exception e
+        {:error e}))))
 
 (defn lambda-function
   [in out context]
   (log/info "start")
-  (let [body (http-utils/parse-json-input-stream in)
-        env-vars (get-env-vars)]
-    (log/info "body" body ", env-vars" env-vars)
+  (let [body (http-utils/parse-json-input-stream in)]
+    (log/info "body" body)
     (with-open [w (io/writer out)]
       (json/generate-stream (lambda-handler body) w)
       (log/info "lambda-function - finish"))))

@@ -11,6 +11,9 @@
                  [environ "1.1.0"]
                  [com.taoensso/timbre "4.10.0"]
                  [clj-s3-client "1.0.0"]]
+  :plugins [[lein-environ "1.1.0"]]
   :resource-paths ["resources"]
-  :profiles {:uberjar {:aot :all}}
-  :uberjar-name "clj-lambda-graphviz-s3.zip")
+  :uberjar-name "clj-lambda-graphviz-s3.zip"
+  :profiles {:dev {:env {:use-system-graphviz true}}
+             :lambda {:env {:use-system-graphviz false}}
+             :uberjar {:aot :all}})
